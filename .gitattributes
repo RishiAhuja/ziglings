@@ -1,0 +1,13 @@
+# Ensure consistent line endings
+* text=auto
+
+# Treat Zig cache and output directories as binary
+.zig-cache/ binary
+zig-out/ binary
+
+# Set attributes for specific file types
+*.zig text
+*.txt text
+*.md text
+*.o binary
+*.a binary
