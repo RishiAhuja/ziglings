@@ -8,6 +8,37 @@ var global_var: u8 = 0;
 
 // const some_var = 0; // type inference
 
+const Color = enum(u2) {
+    Red,
+    Green,
+    Blue,
+    _, // Non exhaustive enum
+
+    // You can also have members within enums
+};
+
+const Number = union {
+    int: u32,
+    float: f32,
+};
+
+// A union is a type that can hold one of several specified types,
+// but only one at a time. It is useful when you want a variable
+// to be able to store different types of values at different times.
+
+// In Zig, a tagged union is a type that can hold one of several specified types,
+// along with a tag that indicates which type is currently held.
+// This is useful for creating types that can represent multiple different
+// kinds of data while keeping track of which kind is currently in use.
+const Number2 = union(enum) {
+    Int: u32,
+    Float: f32,
+
+    fn is(self: Number2, tag: std.meta.Tag(Number2)) bool {
+        return self == tag;
+    }
+};
+
 pub fn main() !void {
     // comptime var some_var = 2;
 
@@ -112,6 +143,41 @@ pub fn main() !void {
     } else {
         std.debug.print("else\n", .{});
     }
+
+    // `blk` or blocks are used to create a scope for variables and defer statements.
+    // They are useful for limiting the scope of variables and for creating complex expressions.
+
+    const result2 = blk: {
+        const x1 = 20;
+        const y1 = 20;
+        break :blk x1 + y1;
+    };
+
+    switch (x) {
+        // Ranges inclusive of both ends
+        0...20 => std.debug.print("Its from 0 to 20 {}\n", .{x}),
+        31, 32, 33 => std.debug.print("Its 31, 32 or 33 {}\n", .{x}),
+        // You can capture the matched value
+        40, 41, 42 => |n| std.debug.print("Its 40, 41 or 42 {}\n", .{n}),
+
+        77 => {
+            // Can execute blocks of code
+            std.debug.print("Its 77 {}\n", .{x});
+        },
+        else => std.debug.print("Its something else {}\n", .{x}),
+    }
+
+    std.debug.print("Result: {}\n", .{result2});
+
+    // When the type can be inffered, you can omit the enum name
+    // const color: Color = Color.Red;
+    const color: Color = .Red;
+    std.debug.print("Color: {}\n", .{color});
+    std.debug.print("Color: {}\n", .{@intFromEnum(color)});
+
+    // Using unions
+    const number: Number = .{ .int = 13 };
+    std.debug.print("Number: {}\n", .{number.int});
 
     const stdout_file = std.io.getStdOut().writer();
     var bw = std.io.bufferedWriter(stdout_file);
